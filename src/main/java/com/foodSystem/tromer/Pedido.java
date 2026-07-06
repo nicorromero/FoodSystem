@@ -6,6 +6,7 @@
 package com.foodSystem.tromer;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -46,13 +47,13 @@ public class Pedido {
         return total;
     }
 
-    public Pedido(String cliente, List<Producto> item, boolean estado, Destino destino, LocalDateTime fecha, double total) {
+    public Pedido(String cliente, boolean estado, Destino destino, LocalDateTime fecha, double total) {
         this.cliente = cliente;
-        this.item = item;
         this.estado = estado;
         this.destino = destino;
         this.fecha = fecha;
         this.total = total;
+        this.item = new ArrayList();
     }
 
     

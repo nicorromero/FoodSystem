@@ -13,4 +13,15 @@ public enum Categoria{
     POSTRE,
     PLATO,
     BEBIDA 
+    
+    public static Categoria desdeString(String texto){
+        if(texto == null){
+            return null;
+        }
+        try{
+            return Categoria.valueOf(texto.trim().toUpperCase());
+        }catch(Illef){
+            return null;
+        }
+    }
 }
