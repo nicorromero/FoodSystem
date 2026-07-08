@@ -8,37 +8,72 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- *
+ *@author tomas
  * @author nicor
  */
 public class Gestor {
-    private List<Pedido> listaPedidos;
-    private List<Producto> ListaProductos;
-    private List<Reserva> ListaReservas;
+    
+    private GestorProducto gestorProducto;
+    private GestorPedido gestorPedido;
+    private GestorReserva gestorReserva;
 
-   public Producto registrarProducto(String nombre , double precio, String categoria){
-    if(precio <= 0){
-        throw new IllegalArgumentException("el precio no puede ser menor a 0");
+    public Gestor(GestorProducto gestorProducto, GestorPedido gestorPedido, GestorReserva gestorReserva) {
+        this.gestorProducto = gestorProducto;
+        this.gestorPedido = gestorPedido;
+        this.gestorReserva = gestorReserva;
     }
-    if(nombre == null || nombre.trim().isEmpty()){
-        throw new IllegalArgumentException("el nombre no existe");
-    } 
-    Categoria cat = Categoria.desdeString(categoria);
-    Producto p1 = new Producto(nombre,  cat,  precio);
-    ListaProductos.add(p1);
-    return p1;
-   }
-   
-   /*
-   public Pedido registrarPedido(String cliente, boolean estado, Destino destino, LocalDateTime fecha, double total){
-       if(total<= 0){
-          throw new IllegalArgumentException("el total no puede ser menor a 0");
-       }
-       if(cliente == null) || cliente.trim().isEmpty(){
-            throw new IllegalArgumentException("ingrese el cliente");
-       }
-       
-       
-   }
-    */
+    //FUNCIONES DE PRODUCTOS
+    public Producto registrarNuevoProducto(String nombre , double precio, String categoria){
+        return gestorProducto.registrarProducto(nombre, precio, categoria);
+    }
+    
+    public boolean eliminarProducto(String nombre){
+        return gestorProducto.eliminarProducto(nombre);
+    }
+    
+    public boolean editarProductoExistente(String nombreActual, String nuevoNombre, double nuevoPrecio, String nuevaCategoria){
+        return gestorProducto.editarProducto(nombreActual, nuevoNombre, nuevoPrecio, nuevaCategoria);
+    }
+    
+    public void mostrarProductos(){
+        gestorProducto.mostrarProductos();
+    }
+    
+    //FUNCIONES DE PEDIDOS
+    
+    public Pedido registrarNuevoPedido(String cliente, boolean estado, Destino destino, LocalDateTime fecha, double total){
+        return gestorPedido.registrarPedido(cliente, estado, destino, fecha, total);
+    }
+    
+    public boolean eliminarPedido(String cliente){
+        return gestorPedido.eliminarPedido(cliente);
+    }
+    
+    public boolean editarPedidoExistente(String clienteActual, String nuevoNombre, boolean nuevoEstado,Destino nuevoDestino){
+        return gestorPedido.editarPedido(clienteActual, nuevoNombre, nuevoEstado, nuevoDestino);
+    }
+    
+    public void mostrarPedidos(){
+        gestorPedido.mostrarPedido();
+    }
+    
+    //FUNCIONES DE RESERVAS
+    
+    public Reserva registrarNuevaReserva(String cliente, int cantidad, LocalDateTime fecha){
+        return gestorReserva.registrarReserva(cliente, cantidad, fecha);
+    }
+    
+    public boolean eliminarReserva(String cliente){
+        return gestorReserva.eliminarReserva(cliente);
+    }
+    
+    public boolean editarReservaExistente(String clienteActual, String nuevoNombre, int nuevaCantidad){
+        return gestorReserva.editarReserva(clienteActual, nuevoNombre, nuevaCantidad);
+    }
+    
+    public void mostrarReservas(){
+        gestorReserva.mostrarReservas();
+    }
+    
+
 }

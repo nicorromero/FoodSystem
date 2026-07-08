@@ -32,6 +32,14 @@ public class Reserva {
         this.cantidad = cantidad;
         this.fecha = fecha;
     }
+
+    public void setCliente(String cliente) {
+        this.cliente = cliente;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
     
     
 }

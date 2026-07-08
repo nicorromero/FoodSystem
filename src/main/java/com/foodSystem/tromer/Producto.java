@@ -31,6 +31,18 @@ public class Producto {
         this.categoria = categoria;
         this.precio = precio;
     }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
+    public void setPrecio(Double precio) {
+        this.precio = precio;
+    }
     
     
     
