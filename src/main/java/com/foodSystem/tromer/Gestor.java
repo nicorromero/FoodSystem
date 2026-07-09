@@ -36,9 +36,7 @@ public class Gestor {
        }
        if(cliente == null) || cliente.trim().isEmpty(){
             throw new IllegalArgumentException("ingrese el cliente");
-       }
-       
-       
+       }   
    }
     */
 }

@@ -12,7 +12,7 @@ package com.foodSystem.tromer;
 public enum Categoria{
     POSTRE,
     PLATO,
-    BEBIDA 
+    BEBIDA; 
     
     public static Categoria desdeString(String texto){
         if(texto == null){
@@ -20,7 +20,7 @@ public enum Categoria{
         }
         try{
             return Categoria.valueOf(texto.trim().toUpperCase());
-        }catch(Illef){
+        }catch(IllegalArgumentException e){
             return null;
         }
     }
