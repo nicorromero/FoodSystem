@@ -12,7 +12,11 @@ package com.foodSystem.tromer;
 public enum Categoria{
     POSTRE,
     PLATO,
+<<<<<<< HEAD
     BEBIDA; 
+=======
+    BEBIDA ;
+>>>>>>> 4c2bd3d9acd74446016ef9a2575f6e7f085fb42b
     
     public static Categoria desdeString(String texto){
         if(texto == null){
@@ -20,7 +24,12 @@ public enum Categoria{
         }
         try{
             return Categoria.valueOf(texto.trim().toUpperCase());
+<<<<<<< HEAD
         }catch(IllegalArgumentException e){
+=======
+        }
+        catch(IllegalArgumentException e){
+>>>>>>> 4c2bd3d9acd74446016ef9a2575f6e7f085fb42b
             return null;
         }
     }

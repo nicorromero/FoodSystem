@@ -31,7 +31,7 @@ public class Pedido {
         return item;
     }
 
-    public boolean isEstado() {
+    public boolean getEstado() {
         return estado;
     }
 
@@ -54,6 +54,18 @@ public class Pedido {
         this.fecha = fecha;
         this.total = total;
         this.item = new ArrayList();
+    }
+
+    public void setCliente(String cliente) {
+        this.cliente = cliente;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }
+
+    public void setDestino(Destino destino) {
+        this.destino = destino;
     }
 
     
