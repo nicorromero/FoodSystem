@@ -2,18 +2,22 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.foodSystem.tromer;
+package com.foodSystem.tromer.Service;
 
+import com.foodSystem.tromer.Categoria;
+import com.foodSystem.tromer.Producto;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Tomas
  */
-public class GestorProducto {
+@Service
+public class ProductoService {
     
-  private List<Producto> listaProductos = new ArrayList<>() ;
+    private List<Producto> listaProductos = new ArrayList<>() ;
    
    public Producto registrarProducto(String nombre , double precio, String categoria){
     if(precio <= 0){
@@ -79,7 +83,5 @@ public class GestorProducto {
     
       
   }
-
-   
-   
+    
 }

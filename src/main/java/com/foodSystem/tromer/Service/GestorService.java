@@ -2,22 +2,28 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.foodSystem.tromer;
+package com.foodSystem.tromer.Service;
 
+import com.foodSystem.tromer.Destino;
+import com.foodSystem.tromer.Pedido;
+import com.foodSystem.tromer.Producto;
+import com.foodSystem.tromer.Reserva;
 import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.stereotype.Service;
 
 /**
- *@author tomas
- * @author nicor
+ *
+ * @author Tomas
  */
-public class Gestor {
-    
-    private GestorProducto gestorProducto;
-    private GestorPedido gestorPedido;
-    private GestorReserva gestorReserva;
 
-    public Gestor(GestorProducto gestorProducto, GestorPedido gestorPedido, GestorReserva gestorReserva) {
+@Service
+public class GestorService {
+    
+    private ProductoService gestorProducto;
+    private PedidoService gestorPedido;
+    private ReservaService gestorReserva;
+
+    public GestorService(ProductoService gestorProducto, PedidoService gestorPedido, ReservaService gestorReserva) {
         this.gestorProducto = gestorProducto;
         this.gestorPedido = gestorPedido;
         this.gestorReserva = gestorReserva;
@@ -75,5 +81,4 @@ public class Gestor {
         gestorReserva.mostrarReservas();
     }
     
-
 }

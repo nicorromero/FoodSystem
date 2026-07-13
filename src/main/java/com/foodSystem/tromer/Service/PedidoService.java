@@ -2,18 +2,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.foodSystem.tromer;
+package com.foodSystem.tromer.Service;
 
+import com.foodSystem.tromer.Destino;
+import com.foodSystem.tromer.Pedido;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Tomas
  */
-public class GestorPedido {
-    
+@Service
+public class PedidoService {
     private List<Pedido> listaPedidos = new ArrayList<>();
     
     public Pedido registrarPedido(String cliente, boolean estado, Destino destino, LocalDateTime fecha, double total){

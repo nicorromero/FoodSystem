@@ -2,19 +2,22 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.foodSystem.tromer;
+package com.foodSystem.tromer.Service;
 
+import com.foodSystem.tromer.Reserva;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Tomas
  */
-public class GestorReserva {
+@Service
+public class ReservaService {
     
-    private List<Reserva> listaReservas = new ArrayList<>();
+     private List<Reserva> listaReservas = new ArrayList<>();
     
     public Reserva registrarReserva (String cliente, int cantidad, LocalDateTime fecha){
         if(cantidad <= 0){

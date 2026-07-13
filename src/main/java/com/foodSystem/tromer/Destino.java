@@ -8,7 +8,7 @@ package com.foodSystem.tromer;
  *
  * @author nicor
  */
- abstract class Destino {
+ public abstract class Destino {
    
      private String nombre;
      
