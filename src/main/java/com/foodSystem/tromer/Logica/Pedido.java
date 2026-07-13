@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 
-package com.foodSystem.tromer;
+package com.foodSystem.tromer.Logica;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
