@@ -4,8 +4,9 @@
  */
 package com.foodSystem.tromer.Service;
 
-import com.foodSystem.tromer.Destino;
-import com.foodSystem.tromer.Pedido;
+import com.foodSystem.tromer.Logica.Destino;
+import com.foodSystem.tromer.Logica.Pedido;
+import com.foodSystem.tromer.Repository.PedidoRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PedidoService {
-    private List<Pedido> listaPedidos = new ArrayList<>();
+   
+    private final PedidoRepository pedidoRepository;  
+    
+    public PedidoService(PedidoRepository pedidoRepository) {
+        this.pedidoRepository = pedidoRepository;
+    }
     
     public Pedido registrarPedido(String cliente, boolean estado, Destino destino, LocalDateTime fecha, double total){
        if(total<= 0){
@@ -26,58 +32,50 @@ public class PedidoService {
        if(cliente == null || cliente.trim().isEmpty()){
             throw new IllegalArgumentException("ingrese el cliente");
        }
-       Pedido pe1 = new Pedido(cliente, estado, destino, fecha, total);
-       listaPedidos.add(pe1);
-       return pe1;
+       Pedido nuevoPedido = new Pedido(cliente, estado, destino, fecha, total);
+       
+       return pedidoRepository.save(nuevoPedido);
     }
     
-     public Boolean eliminarPedido(String cliente){
-       if(cliente == null || cliente.trim().isEmpty()){
-        throw new IllegalArgumentException("el nombre no puede estar vacio");
-    }
-       return listaPedidos.removeIf(ped -> ped.getCliente().equalsIgnoreCase(cliente));
-   }
-     
-    public boolean editarPedido(String clienteActual, String nuevoNombre, boolean nuevoEstado,Destino nuevoDestino) {
-    
-    if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
-        throw new IllegalArgumentException("El nuevo nombre no puede estar vacío");
-    }
-    
-    if(nuevoDestino == null){
-        throw new IllegalArgumentException("debes asignar un destino valido");
-    }
-    
-    for (Pedido ped : listaPedidos) {
-        if (ped.getCliente().equalsIgnoreCase(clienteActual)) {
-            
-            //  Actualizamos los datos 
-            ped.setCliente(nuevoNombre);
-            
-            // El boolean se asigna directo, sin validaciones
-            ped.setEstado(nuevoEstado);
-            
-            ped.setDestino(nuevoDestino);
-            
-            return true; // Se actualizó con éxito
+   public Boolean eliminarPedido(Long id){
+       if (!pedidoRepository.existsById(id)) {
+        
+        throw new IllegalArgumentException("No se encontró la reserva con ID: " + id);
         }
+         pedidoRepository.deleteById(id);
+         return true;
     }
-    
-    return false; 
+     
+    public boolean editarPedido(Long id, String nuevoNombre, boolean nuevoEstado, Destino nuevoDestino) {
+    return pedidoRepository.findById(id).map(ped -> {
+        
+        // Validaciones
+        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nuevo nombre no puede estar vacío");
+        }
+        if (nuevoDestino == null) {
+            throw new IllegalArgumentException("Debes asignar un destino válido");
+        }
+
+        // Seteamos cambios
+        ped.setCliente(nuevoNombre);
+        ped.setEstado(nuevoEstado);
+        ped.setDestino(nuevoDestino);
+
+        pedidoRepository.save(ped); // JPA detecta el ID y hace un UPDATE
+        return true;
+        
+    }).orElse(false);
 }
     
-    public void mostrarPedido(){
-        if(listaPedidos.isEmpty()){
-            throw new IllegalArgumentException("no se encuentran pedidos");
-        }
-        System.out.println("lista de pedidos");
-        for(Pedido ped : listaPedidos){
-            System.out.println("cliente: "+ped.getCliente()+
-                               "estado: "+ped.getEstado()+
-                               "destino: "+ped.getDestino()+
-                               "fecha: "+ped.getFecha()+
-                               "total: "+ped.getTotal());
-        }
+    public List<Pedido> mostrarPedido(){
+    
+    List<Pedido> lista = pedidoRepository.findAll();
+    
+    if (lista.isEmpty()) {
+        throw new IllegalArgumentException("No se encuentran pedidos en la base de datos");
+    }
+    return lista;
     }
     
 }

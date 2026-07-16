@@ -4,17 +4,20 @@
  */
 package com.foodSystem.tromer.Service;
 
-import com.foodSystem.tromer.Destino;
-import com.foodSystem.tromer.Pedido;
-import com.foodSystem.tromer.Producto;
-import com.foodSystem.tromer.Reserva;
+
+import com.foodSystem.tromer.Logica.Destino;
+import com.foodSystem.tromer.Logica.Pedido;
+import com.foodSystem.tromer.Logica.Producto;
+import com.foodSystem.tromer.Logica.Reserva;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Tomas
- */
+
+ * @author nicor
+*/
 
 @Service
 public class GestorService {
@@ -33,12 +36,12 @@ public class GestorService {
         return gestorProducto.registrarProducto(nombre, precio, categoria);
     }
     
-    public boolean eliminarProducto(String nombre){
-        return gestorProducto.eliminarProducto(nombre);
+    public boolean eliminarProducto(Long id){
+        return gestorProducto.eliminarProducto(id);
     }
     
-    public boolean editarProductoExistente(String nombreActual, String nuevoNombre, double nuevoPrecio, String nuevaCategoria){
-        return gestorProducto.editarProducto(nombreActual, nuevoNombre, nuevoPrecio, nuevaCategoria);
+    public boolean editarProductoExistente(Long id, String nuevoNombre, double nuevoPrecio, String nuevaCategoria){
+        return gestorProducto.editarProducto(id, nuevoNombre, 0, nuevaCategoria);
     }
     
     public void mostrarProductos(){
@@ -51,12 +54,12 @@ public class GestorService {
         return gestorPedido.registrarPedido(cliente, estado, destino, fecha, total);
     }
     
-    public boolean eliminarPedido(String cliente){
-        return gestorPedido.eliminarPedido(cliente);
+    public boolean eliminarPedido(Long id){
+        return gestorPedido.eliminarPedido(id);
     }
     
-    public boolean editarPedidoExistente(String clienteActual, String nuevoNombre, boolean nuevoEstado,Destino nuevoDestino){
-        return gestorPedido.editarPedido(clienteActual, nuevoNombre, nuevoEstado, nuevoDestino);
+    public boolean editarPedidoExistente(Long id, String nuevoNombre, boolean nuevoEstado,Destino nuevoDestino){
+        return gestorPedido.editarPedido(id, nuevoNombre, nuevoEstado, nuevoDestino);
     }
     
     public void mostrarPedidos(){
@@ -69,16 +72,17 @@ public class GestorService {
         return gestorReserva.registrarReserva(cliente, cantidad, fecha);
     }
     
-    public boolean eliminarReserva(String cliente){
-        return gestorReserva.eliminarReserva(cliente);
+    public boolean eliminarReserva(Long id){
+        return gestorReserva.eliminarReserva(id);
     }
     
-    public boolean editarReservaExistente(String clienteActual, String nuevoNombre, int nuevaCantidad){
-        return gestorReserva.editarReserva(clienteActual, nuevoNombre, nuevaCantidad);
+    public boolean editarReservaExistente(Long id, String nuevoNombre, int nuevaCantidad){
+        return gestorReserva.eliminarReserva(id);
     }
     
     public void mostrarReservas(){
         gestorReserva.mostrarReservas();
     }
     
+
 }

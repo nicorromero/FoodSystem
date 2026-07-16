@@ -4,8 +4,9 @@
  */
 package com.foodSystem.tromer.Service;
 
-import com.foodSystem.tromer.Categoria;
-import com.foodSystem.tromer.Producto;
+import com.foodSystem.tromer.Logica.Categoria;
+import com.foodSystem.tromer.Logica.Producto;
+import com.foodSystem.tromer.Repository.ProductoRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductoService {
     
-    private List<Producto> listaProductos = new ArrayList<>() ;
+   private final ProductoRepository productoRepository;
+
+    public ProductoService(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
+    }
+   
+   
    
    public Producto registrarProducto(String nombre , double precio, String categoria){
     if(precio <= 0){
@@ -28,60 +35,60 @@ public class ProductoService {
     } 
     Categoria cat = Categoria.desdeString(categoria);
     Producto p1 = new Producto(nombre,  cat,  precio);
-    listaProductos.add(p1);
-    return p1;
+    
+    return productoRepository.save(p1);
    }
    
-   public boolean eliminarProducto(String nombre){
-       if(nombre == null || nombre.trim().isEmpty()){
-        throw new IllegalArgumentException("el nombre no puede estar vacio");
-    }
-       return listaProductos.removeIf(prod -> prod.getNombre().equalsIgnoreCase(nombre));
-   }
-   
-  public boolean editarProducto(String nombreActual, String nuevoNombre, double nuevoPrecio, String nuevaCategoria) {
-    
-    if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
-        throw new IllegalArgumentException("El nuevo nombre no puede estar vacío");
-    }
-    if (nuevoPrecio <= 0) {
-        throw new IllegalArgumentException("El nuevo precio no puede ser menor o igual a 0");
-    }
-    
-    for (Producto prod : listaProductos) {
-        if (prod.getNombre().equalsIgnoreCase(nombreActual)) {
-            
-            
-            prod.setNombre(nuevoNombre); 
-            prod.setPrecio(nuevoPrecio);
-            
-            Categoria catNueva = Categoria.desdeString(nuevaCategoria); 
-            if (catNueva != null) {
-                prod.setCategoria(catNueva);
-            }
-            
-            return true; 
+   public boolean eliminarProducto(Long id) {
+        if (productoRepository.existsById(id)) {
+            productoRepository.deleteById(id);
+            return true;
         }
+        return false;
     }
-    
-    return false; 
-}
+   
+   public boolean editarProducto(Long id, String nuevoNombre, double nuevoPrecio, String nuevaCategoria) {
+    //Buscamos el producto en la base de datos por su ID
+    return productoRepository.findById(id).map(productoExistente -> {
+        
+        //Validamos los nuevos datos antes de aplicarlos
+        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nuevo nombre no puede estar vacío");
+        }
+        if (nuevoPrecio <= 0) {
+            throw new IllegalArgumentException("El nuevo precio no puede ser menor o igual a 0");
+        }
+
+        //Aplicamos los cambios al objeto recuperado
+        productoExistente.setNombre(nuevoNombre);
+        productoExistente.setPrecio(nuevoPrecio);
+        
+        Categoria catNueva = Categoria.desdeString(nuevaCategoria);
+        if (catNueva != null) {
+            productoExistente.setCategoria(catNueva);
+        }
+
+        // Guardamos los cambios. Al tener el mismo ID, JPA hace un UPDATE automáticamente
+        productoRepository.save(productoExistente);
+        return true;
+        
+    }).orElse(false); // Retorna false si no se encontró el producto con ese ID
+   }
   
   
-  public void mostrarProductos(){
-      if(listaProductos.isEmpty()){
-          throw new IllegalArgumentException("no hay ningun producto cargado");
-      }
+    public List<Producto> mostrarProductos() {
       
-    System.out.println("lista de productos");
-    for(Producto prod : listaProductos){
-        System.out.println("producto: "+prod.getNombre()+
-                          "categoria: "+prod.getCategoria()+
-                          "precio: "+prod.getPrecio());
+    List<Producto> lista = productoRepository.findAll();
+    
+    if (lista.isEmpty()) {
+        throw new IllegalArgumentException("No se encuentran pedidos en la base de datos");
     }
+    return lista;
+    }
+   }
     
     
       
-  }
+  
     
-}
+

@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Enum.java to edit this template
  */
 
-package com.foodSystem.tromer;
+package com.foodSystem.tromer.Logica;
 
 /**
  *
@@ -12,7 +12,7 @@ package com.foodSystem.tromer;
 public enum Categoria{
     POSTRE,
     PLATO,
-    BEBIDA ;
+    BEBIDA;
     
     public static Categoria desdeString(String texto){
         if(texto == null){
@@ -20,9 +20,8 @@ public enum Categoria{
         }
         try{
             return Categoria.valueOf(texto.trim().toUpperCase());
-        }
-        catch(IllegalArgumentException e){
+        }catch(IllegalArgumentException e){
             return null;
-        }
+        }   
     }
 }
