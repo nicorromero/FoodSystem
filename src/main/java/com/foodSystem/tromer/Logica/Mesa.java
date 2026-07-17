@@ -4,13 +4,17 @@
  */
 package com.foodSystem.tromer.Logica;
 
-/**
- *
- * @author nicor
- */
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("MESA")
 public class Mesa extends Destino {
  
     private String numMesa;
+
+    public Mesa() {
+    }
     
     @Override
     void Enviar(String numMesa) {

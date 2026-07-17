@@ -4,17 +4,37 @@
  */
 package com.foodSystem.tromer.Logica;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 
 /**
  *
- * @author nicor
+ *
  */
+@Entity
 public class Reserva {
+    
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private long id ;
+    
     private String cliente;
     private int cantidad;
     private LocalDateTime fecha;
 
+    public Reserva() {
+    }
+
+    public Reserva(String cliente, int cantidad, LocalDateTime fecha) {
+        this.cliente = cliente;
+        this.cantidad = cantidad;
+        this.fecha = fecha;
+    }
+    
+    
     public String getCliente() {
         return cliente;
     }
@@ -25,12 +45,6 @@ public class Reserva {
 
     public LocalDateTime getFecha() {
         return fecha;
-    }
-
-    public Reserva(String cliente, int cantidad, LocalDateTime fecha) {
-        this.cliente = cliente;
-        this.cantidad = cantidad;
-        this.fecha = fecha;
     }
 
     public void setCliente(String cliente) {
