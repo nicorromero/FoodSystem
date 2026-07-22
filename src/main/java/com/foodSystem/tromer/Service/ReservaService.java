@@ -1,81 +1,90 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.foodSystem.tromer.Service;
 
-import com.foodSystem.tromer.Logica.Producto;
+import com.foodSystem.tromer.DTO.ReservaRequestDTO;
+import com.foodSystem.tromer.DTO.ReservaResponseDTO;
+import com.foodSystem.tromer.Exception.RecursoNoEncontradoException;
 import com.foodSystem.tromer.Logica.Reserva;
 import com.foodSystem.tromer.Repository.ReservaRepository;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 /**
- *
- * @author Tomas
+ * Servicio de negocio para la gestión de Reservas.
  */
 @Service
+@Transactional
 public class ReservaService {
-    
-    private  final ReservaRepository reservaRepository;
+
+    private final ReservaRepository reservaRepository;
 
     public ReservaService(ReservaRepository reservaRepository) {
         this.reservaRepository = reservaRepository;
     }
-    
-    
-    
-    public Reserva registrarReserva (String cliente, int cantidad, LocalDateTime fecha){
-            if(cantidad <= 0){
-                throw new IllegalArgumentException("la cantidad de personas debe ser mayor a 0");
-            }
-            if(cliente == null || cliente.trim().isEmpty()){
-                throw new IllegalArgumentException("ingrese el cliente");
-            }
-           Reserva r1 = new Reserva(cliente,cantidad,fecha);
-           
-           return reservaRepository.save(r1);
-    }
-    
-    public Boolean eliminarReserva(Long id){
-       if (!reservaRepository.existsById(id)) {
-        // Acá lanzás la excepción solo si es vital que el proceso se detenga
-        throw new IllegalArgumentException("No se encontró la reserva con ID: " + id);
-        }
-         reservaRepository.deleteById(id);
-         return true;
+
+    /**
+     * Registra una nueva Reserva.
+     *
+     * @param dto Datos de la reserva validados por @Valid en el Controller.
+     * @return DTO con los datos de la reserva persistida, incluido su ID.
+     */
+    public ReservaResponseDTO registrarReserva(ReservaRequestDTO dto) {
+        Reserva nueva = new Reserva(dto.cliente(), dto.cantidad(), dto.fecha());
+        return toDTO(reservaRepository.save(nueva));
     }
 
-    public boolean editarReserva (Long id, String nuevoNombre, int nuevaCantidad) {
-         return reservaRepository.findById(id).map(res -> {
-        
-        // Validaciones
-        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nuevo nombre no puede estar vacío");
+    /**
+     * Elimina una Reserva por ID.
+     *
+     * @throws RecursoNoEncontradoException (HTTP 404) si no existe el ID.
+     */
+    public void eliminarReserva(Long id) {
+        if (!reservaRepository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Reserva", id);
         }
-        if (nuevaCantidad == 0) {
-            throw new IllegalArgumentException("debes ingresar una cantidad de personas");
-        }
+        reservaRepository.deleteById(id);
+    }
 
-        // Seteamos cambios
-        res.setCliente(nuevoNombre);
-        res.setCantidad(nuevaCantidad);
+    /**
+     * Edita los campos de una Reserva existente.
+     *
+     * @throws RecursoNoEncontradoException (HTTP 404) si no existe el ID.
+     */
+    public ReservaResponseDTO editarReserva(Long id, ReservaRequestDTO dto) {
+        Reserva res = reservaRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Reserva", id));
+        res.setCliente(dto.cliente());
+        res.setCantidad(dto.cantidad());
+        res.setFecha(dto.fecha());
+        // Dirty checking detecta los cambios; no se necesita save() explícito
+        return toDTO(res);
+    }
 
-        reservaRepository.save(res); // JPA detecta el ID y hace un UPDATE
-        return true;
-        
-    }).orElse(false);
+    /**
+     * Retorna todas las reservas registradas.
+     */
+    @Transactional(readOnly = true)
+    public List<ReservaResponseDTO> mostrarReservas() {
+        return reservaRepository.findAll()
+            .stream()
+            .map(this::toDTO)
+            .toList();
     }
-    
-    public List<Reserva> mostrarReservas(){
-      List<Reserva> lista = reservaRepository.findAll();
-    
-    if (lista.isEmpty()) {
-        throw new IllegalArgumentException("No se encuentran pedidos en la base de datos");
+
+    /**
+     * Busca una Reserva por ID.
+     *
+     * @throws RecursoNoEncontradoException (HTTP 404) si no existe.
+     */
+    @Transactional(readOnly = true)
+    public ReservaResponseDTO buscarPorId(Long id) {
+        return reservaRepository.findById(id)
+            .map(this::toDTO)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Reserva", id));
     }
-    return lista;
+
+    /** Convierte una entidad Reserva a su DTO de salida. */
+    private ReservaResponseDTO toDTO(Reserva r) {
+        return new ReservaResponseDTO(r.getId(), r.getCliente(), r.getCantidad(), r.getFecha());
     }
-    
 }

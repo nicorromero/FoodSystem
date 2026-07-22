@@ -1,97 +1,114 @@
 package com.foodSystem.tromer.Service;
 
+import com.foodSystem.tromer.DTO.PedidoRequestDTO;
+import com.foodSystem.tromer.DTO.PedidoResponseDTO;
+import com.foodSystem.tromer.Exception.RecursoNoEncontradoException;
 import com.foodSystem.tromer.Logica.Destino;
-import com.foodSystem.tromer.Logica.EstadoPedido;
 import com.foodSystem.tromer.Logica.Pedido;
+import com.foodSystem.tromer.Repository.DestinoRepository;
 import com.foodSystem.tromer.Repository.PedidoRepository;
-import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 /**
  * Servicio de negocio para la gestión de Pedidos.
- * La lógica de construcción y mutación de estado se delega a los métodos de
- * dominio de la entidad Pedido, manteniendo este servicio como orquestador.
+ *
+ * La lógica de construcción y mutación de estado se delega a los métodos
+ * de dominio de la entidad Pedido (agregarItem, avanzarEstado, cancelar).
+ * Este servicio actúa como orquestador.
  */
 @Service
+@Transactional
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
+    private final DestinoRepository destinoRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository) {
+    public PedidoService(PedidoRepository pedidoRepository, DestinoRepository destinoRepository) {
         this.pedidoRepository = pedidoRepository;
+        this.destinoRepository = destinoRepository;
     }
 
     /**
-     * Registra un nuevo pedido. El estado inicial siempre será PENDIENTE
+     * Registra un nuevo Pedido. El estado inicial siempre será PENDIENTE
      * y la fecha se asigna automáticamente en el constructor de Pedido.
      *
-     * @param cliente Nombre del cliente.
-     * @param destino Destino del pedido (Mesa o Delivery). No puede ser nulo.
-     * @return El pedido persistido con su ID generado.
+     * @throws RecursoNoEncontradoException (HTTP 404) si el destinoId no existe.
      */
-    public Pedido registrarPedido(String cliente, Destino destino) {
-        if (cliente == null || cliente.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre del cliente no puede estar vacío");
-        }
-        if (destino == null) {
-            throw new IllegalArgumentException("Debes asignar un destino válido");
-        }
-        // El constructor garantiza estado=PENDIENTE, fecha=now(), total=0
-        Pedido nuevoPedido = new Pedido(cliente, destino);
-        return pedidoRepository.save(nuevoPedido);
+    public PedidoResponseDTO registrarPedido(PedidoRequestDTO dto) {
+        Destino destino = destinoRepository.findById(dto.destinoId())
+            .orElseThrow(() -> new RecursoNoEncontradoException("Destino", dto.destinoId()));
+        Pedido nuevoPedido = new Pedido(dto.cliente(), destino);
+        return toDTO(pedidoRepository.save(nuevoPedido));
     }
 
     /**
-     * Elimina un pedido por su ID.
+     * Edita los campos mutables de un Pedido existente.
      *
-     * @param id ID del pedido a eliminar.
-     * @return true si fue eliminado correctamente.
-     * @throws IllegalArgumentException si no existe un pedido con ese ID.
+     * @throws RecursoNoEncontradoException (HTTP 404) si el pedido o destino no existe.
      */
-    public Boolean eliminarPedido(Long id) {
+    public PedidoResponseDTO editarPedido(Long id, PedidoRequestDTO dto) {
+        Pedido ped = pedidoRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Pedido", id));
+        Destino destino = destinoRepository.findById(dto.destinoId())
+            .orElseThrow(() -> new RecursoNoEncontradoException("Destino", dto.destinoId()));
+        ped.setCliente(dto.cliente());
+        ped.setDestino(destino);
+        if (dto.estado() != null) {
+            ped.setEstado(dto.estado());
+        }
+        // Dirty checking de Hibernate detecta los cambios y hace UPDATE al cerrar la transacción
+        return toDTO(ped);
+    }
+
+    /**
+     * Elimina un Pedido por ID.
+     *
+     * @throws RecursoNoEncontradoException (HTTP 404) si no existe el ID.
+     */
+    public void eliminarPedido(Long id) {
         if (!pedidoRepository.existsById(id)) {
-            throw new IllegalArgumentException("No se encontró el pedido con ID: " + id);
+            throw new RecursoNoEncontradoException("Pedido", id);
         }
         pedidoRepository.deleteById(id);
-        return true;
-    }
-
-    /**
-     * Edita los campos mutables de un pedido existente.
-     *
-     * @param id           ID del pedido a editar.
-     * @param nuevoNombre  Nuevo nombre del cliente.
-     * @param nuevoEstado  Nuevo estado del pedido (tipo EstadoPedido).
-     * @param nuevoDestino Nuevo destino del pedido.
-     * @return true si se encontró y actualizó, false si no existe el ID.
-     */
-    public boolean editarPedido(Long id, String nuevoNombre, EstadoPedido nuevoEstado, Destino nuevoDestino) {
-        return pedidoRepository.findById(id).map(ped -> {
-            if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
-                throw new IllegalArgumentException("El nuevo nombre no puede estar vacío");
-            }
-            if (nuevoDestino == null) {
-                throw new IllegalArgumentException("Debes asignar un destino válido");
-            }
-            ped.setCliente(nuevoNombre);
-            ped.setEstado(nuevoEstado);
-            ped.setDestino(nuevoDestino);
-            pedidoRepository.save(ped);
-            return true;
-        }).orElse(false);
     }
 
     /**
      * Retorna todos los pedidos registrados.
-     *
-     * @return Lista de pedidos.
-     * @throws IllegalArgumentException si no hay pedidos en la base de datos.
      */
-    public List<Pedido> mostrarPedido() {
-        List<Pedido> lista = pedidoRepository.findAll();
-        if (lista.isEmpty()) {
-            throw new IllegalArgumentException("No se encuentran pedidos en la base de datos");
-        }
-        return lista;
+    @Transactional(readOnly = true)
+    public List<PedidoResponseDTO> mostrarPedido() {
+        return pedidoRepository.findAll()
+            .stream()
+            .map(this::toDTO)
+            .toList();
+    }
+
+    /**
+     * Busca un Pedido por ID.
+     *
+     * @throws RecursoNoEncontradoException (HTTP 404) si no existe.
+     */
+    @Transactional(readOnly = true)
+    public PedidoResponseDTO buscarPorId(Long id) {
+        return pedidoRepository.findById(id)
+            .map(this::toDTO)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Pedido", id));
+    }
+
+    /** Convierte una entidad Pedido a su DTO de salida, aplanando el Destino. */
+    private PedidoResponseDTO toDTO(Pedido p) {
+        Long destinoId = p.getDestino() != null ? p.getDestino().getId() : null;
+        String destinoNombre = p.getDestino() != null ? p.getDestino().getNombre() : null;
+        return new PedidoResponseDTO(
+            p.getId(),
+            p.getCliente(),
+            p.getEstado().name(),
+            p.getTotal(),
+            p.getFecha(),
+            destinoId,
+            destinoNombre
+        );
     }
 }
