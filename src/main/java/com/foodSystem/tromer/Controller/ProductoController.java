@@ -10,11 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/productos")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProductoController {
-
+   
+    @Autowired
     private final ProductoRepository productoRepository;
 
     // Inyección por constructor (buena práctica vs @Autowired en campo)
