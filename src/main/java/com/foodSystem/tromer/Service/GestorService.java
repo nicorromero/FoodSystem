@@ -1,5 +1,6 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.foodSystem.tromer.Service;
@@ -31,6 +32,9 @@ public class GestorService {
         this.gestorPedido = gestorPedido;
         this.gestorReserva = gestorReserva;
     }
+    
+    public GestorService (){};
+    
     //FUNCIONES DE PRODUCTOS
     public Producto registrarNuevoProducto(String nombre , double precio, String categoria){
         return gestorProducto.registrarProducto(nombre, precio, categoria);
