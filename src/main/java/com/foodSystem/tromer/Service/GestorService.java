@@ -7,6 +7,7 @@ package com.foodSystem.tromer.Service;
 
 
 import com.foodSystem.tromer.Logica.Destino;
+import com.foodSystem.tromer.Logica.EstadoPedido;
 import com.foodSystem.tromer.Logica.Pedido;
 import com.foodSystem.tromer.Logica.Producto;
 import com.foodSystem.tromer.Logica.Reserva;
@@ -54,15 +55,15 @@ public class GestorService {
     
     //FUNCIONES DE PEDIDOS
     
-    public Pedido registrarNuevoPedido(String cliente, boolean estado, Destino destino, LocalDateTime fecha, double total){
-        return gestorPedido.registrarPedido(cliente, estado, destino, fecha, total);
+    public Pedido registrarNuevoPedido(String cliente, Destino destino) {
+        return gestorPedido.registrarPedido(cliente, destino);
     }
     
     public boolean eliminarPedido(Long id){
         return gestorPedido.eliminarPedido(id);
     }
     
-    public boolean editarPedidoExistente(Long id, String nuevoNombre, boolean nuevoEstado,Destino nuevoDestino){
+    public boolean editarPedidoExistente(Long id, String nuevoNombre, EstadoPedido nuevoEstado, Destino nuevoDestino) {
         return gestorPedido.editarPedido(id, nuevoNombre, nuevoEstado, nuevoDestino);
     }
     

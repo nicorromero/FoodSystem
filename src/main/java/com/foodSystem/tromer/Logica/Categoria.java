@@ -1,27 +1,36 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Enum.java to edit this template
- */
-
 package com.foodSystem.tromer.Logica;
 
+import java.util.Arrays;
+
 /**
- *
- * @author nicor
+ * Categorías válidas para un Producto.
  */
-public enum Categoria{
+public enum Categoria {
     POSTRE,
     PLATO,
     BEBIDA;
-    
-    public static Categoria desdeString(String texto){
-        if(texto == null){
-            return null;
+
+    /**
+     * Convierte un String a su valor de Categoria correspondiente.
+     *
+     * @param texto El nombre de la categoría (insensible a mayúsculas/minúsculas).
+     * @return La instancia de Categoria correspondiente.
+     * @throws IllegalArgumentException si el texto es nulo, vacío o no corresponde a ningún valor.
+     */
+    public static Categoria desdeString(String texto) {
+        if (texto == null || texto.isBlank()) {
+            throw new IllegalArgumentException(
+                "La categoría no puede ser nula o vacía. Valores válidos: " +
+                Arrays.toString(Categoria.values())
+            );
         }
-        try{
+        try {
             return Categoria.valueOf(texto.trim().toUpperCase());
-        }catch(IllegalArgumentException e){
-            return null;
-        }   
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                "Categoría inválida: '" + texto + "'. Valores válidos: " +
+                Arrays.toString(Categoria.values())
+            );
+        }
     }
 }

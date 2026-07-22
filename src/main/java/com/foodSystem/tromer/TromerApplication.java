@@ -27,6 +27,6 @@ import java.util.List;
 public class TromerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TromerApplication.class, args)
+        SpringApplication.run(TromerApplication.class, args);
     }
 }
