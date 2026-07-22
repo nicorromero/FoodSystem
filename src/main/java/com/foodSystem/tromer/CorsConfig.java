@@ -23,8 +23,7 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000", "http://localhost:5173") // Puertos comunes de React (Vite o Create React App)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowedHeaders("Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With");
             }
         };
     }
