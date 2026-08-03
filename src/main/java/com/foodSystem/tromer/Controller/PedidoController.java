@@ -1,8 +1,9 @@
-package com.foodSystem.tromer.Controller;
+package com.foodSystem.tromer.controller;
 
-import com.foodSystem.tromer.DTO.PedidoRequestDTO;
-import com.foodSystem.tromer.DTO.PedidoResponseDTO;
-import com.foodSystem.tromer.Service.PedidoService;
+import com.foodSystem.tromer.dataTranferObject.PedidoRequestDTO;
+import com.foodSystem.tromer.dataTranferObject.PedidoResponseDTO;
+import com.foodSystem.tromer.service.PedidoService;
+
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,8 @@ import java.util.List;
  * Endpoint base: /api/pedidos
  *
  * El body del POST espera: { "cliente": "...", "destinoId": 1 }
- * El body del PUT espera:  { "cliente": "...", "destinoId": 1, "estado": "EN_PREPARACION" }
+ * El body del PUT espera: { "cliente": "...", "destinoId": 1, "estado":
+ * "EN_PREPARACION" }
  */
 @RestController
 @RequestMapping("/api/pedidos")
@@ -40,13 +42,14 @@ public class PedidoController {
 
     /**
      * POST /api/pedidos → crea un nuevo pedido.
-     * El estado se fija a PENDIENTE automáticamente; no se acepta en el body al crear.
+     * El estado se fija a PENDIENTE automáticamente; no se acepta en el body al
+     * crear.
      */
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> crearPedido(
             @Valid @RequestBody PedidoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(pedidoService.registrarPedido(dto));
+                .body(pedidoService.registrarPedido(dto));
     }
 
     /** PUT /api/pedidos/{id} → actualiza cliente, destino y/o estado */

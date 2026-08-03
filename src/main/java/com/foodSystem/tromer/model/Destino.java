@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.Logica;
+package com.foodSystem.tromer.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -14,19 +14,17 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * Entidad abstracta que representa el destino de un Pedido.
- * Sus subclases concretas son Mesa (consumo en local) y Delivery (envío a domicilio).
+ * Sus subclases concretas son Mesa (consumo en local) y Delivery (envío a
+ * domicilio).
  *
- * Estrategia SINGLE_TABLE: Mesa y Delivery se almacenan en la misma tabla 'destinos',
+ * Estrategia SINGLE_TABLE: Mesa y Delivery se almacenan en la misma tabla
+ * 'destinos',
  * distinguidas por la columna discriminadora 'tipo_destino'.
  */
 @Entity
 @Table(name = "destinos")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(
-    name = "tipo_destino",
-    discriminatorType = DiscriminatorType.STRING,
-    columnDefinition = "VARCHAR(20)"
-)
+@DiscriminatorColumn(name = "tipo_destino", discriminatorType = DiscriminatorType.STRING, columnDefinition = "VARCHAR(20)")
 public abstract class Destino {
 
     @Id
@@ -38,7 +36,8 @@ public abstract class Destino {
     private String nombre;
 
     /** Constructor requerido por JPA. No usar directamente en código de negocio. */
-    protected Destino() {}
+    protected Destino() {
+    }
 
     /**
      * Constructor base para subclases.
@@ -49,17 +48,27 @@ public abstract class Destino {
         this.nombre = nombre;
     }
 
-    public Long getId() { return id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getNombre() { return nombre; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    /** Setter de visibilidad protegida: solo las subclases pueden modificar el nombre. */
-    protected void setNombre(String nombre) { this.nombre = nombre; }
+    /**
+     * Setter de visibilidad protegida: solo las subclases pueden modificar el
+     * nombre.
+     */
+    protected void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
     /**
      * Lógica de negocio: procesa el envío al destino concreto.
      *
-     * @param destino Información adicional de envío (dirección, número de mesa, etc.).
+     * @param destino Información adicional de envío (dirección, número de mesa,
+     *                etc.).
      */
     public abstract void enviar(String destino);
 }

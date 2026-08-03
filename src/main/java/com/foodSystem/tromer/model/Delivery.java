@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.Logica;
+package com.foodSystem.tromer.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
@@ -17,7 +17,8 @@ public class Delivery extends Destino {
     private String direccion;
 
     /** Constructor requerido por JPA. No usar directamente en código de negocio. */
-    protected Delivery() {}
+    protected Delivery() {
+    }
 
     /**
      * Constructor de fábrica para crear un Delivery en estado válido.
@@ -30,9 +31,13 @@ public class Delivery extends Destino {
         this.direccion = direccion;
     }
 
-    public String getDireccion() { return direccion; }
+    public String getDireccion() {
+        return direccion;
+    }
 
-    public void setDireccion(String direccion) { this.direccion = direccion; }
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
 
     @Override
     public void enviar(String destino) {

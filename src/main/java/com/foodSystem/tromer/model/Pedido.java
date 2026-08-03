@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.Logica;
+package com.foodSystem.tromer.model;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -28,8 +28,10 @@ import java.util.Objects;
  *
  * Diseño de dominio:
  * - El estado es un enum {@link EstadoPedido} con ciclo de vida controlado.
- * - El total se calcula automáticamente a partir de los ítems (no se inyecta externamente).
- * - La colección 'items' se muta de forma segura para preservar el proxy de Hibernate.
+ * - El total se calcula automáticamente a partir de los ítems (no se inyecta
+ * externamente).
+ * - La colección 'items' se muta de forma segura para preservar el proxy de
+ * Hibernate.
  * - El constructor principal garantiza un estado inicial siempre válido.
  */
 @Entity
@@ -75,10 +77,12 @@ public class Pedido {
     private double total;
 
     /** Constructor requerido por JPA. No usar directamente en código de negocio. */
-    protected Pedido() {}
+    protected Pedido() {
+    }
 
     /**
-     * Constructor de fábrica. Garantiza que el Pedido nace en un estado siempre válido:
+     * Constructor de fábrica. Garantiza que el Pedido nace en un estado siempre
+     * válido:
      * estado=PENDIENTE, total=0, fecha=ahora.
      *
      * @param cliente Nombre del cliente que realiza el pedido.
@@ -129,21 +133,21 @@ public class Pedido {
      */
     public void recalcularTotal() {
         this.total = items.entrySet().stream()
-            .mapToDouble(e -> e.getKey().getPrecio() * e.getValue())
-            .sum();
+                .mapToDouble(e -> e.getKey().getPrecio() * e.getValue())
+                .sum();
     }
 
     /**
      * Avanza el estado del pedido al siguiente en el ciclo de vida.
      * PENDIENTE → EN_PREPARACION → LISTO → ENTREGADO
      *
-     * @throws IllegalStateException si el pedido ya está en estado terminal (ENTREGADO o CANCELADO).
+     * @throws IllegalStateException si el pedido ya está en estado terminal
+     *                               (ENTREGADO o CANCELADO).
      */
     public void avanzarEstado() {
         if (this.estado == EstadoPedido.ENTREGADO || this.estado == EstadoPedido.CANCELADO) {
             throw new IllegalStateException(
-                "No se puede avanzar el estado de un pedido en estado: " + this.estado
-            );
+                    "No se puede avanzar el estado de un pedido en estado: " + this.estado);
         }
         this.estado = EstadoPedido.values()[this.estado.ordinal() + 1];
     }
@@ -165,11 +169,17 @@ public class Pedido {
     // setTotal() eliminado: el total es una invariante derivada de los ítems.
     // setFecha() eliminado: la fecha de creación no debe cambiar.
 
-    public Long getId() { return id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getCliente() { return cliente; }
+    public String getCliente() {
+        return cliente;
+    }
 
-    public void setCliente(String cliente) { this.cliente = cliente; }
+    public void setCliente(String cliente) {
+        this.cliente = cliente;
+    }
 
     /**
      * Retorna una vista no modificable de los ítems del pedido.
@@ -194,21 +204,33 @@ public class Pedido {
         recalcularTotal();
     }
 
-    public EstadoPedido getEstado() { return estado; }
+    public EstadoPedido getEstado() {
+        return estado;
+    }
 
-    public void setEstado(EstadoPedido estado) { this.estado = estado; }
+    public void setEstado(EstadoPedido estado) {
+        this.estado = estado;
+    }
 
-    public Destino getDestino() { return destino; }
+    public Destino getDestino() {
+        return destino;
+    }
 
-    public void setDestino(Destino destino) { this.destino = destino; }
+    public void setDestino(Destino destino) {
+        this.destino = destino;
+    }
 
-    public LocalDateTime getFecha() { return fecha; }
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
 
-    public double getTotal() { return total; }
+    public double getTotal() {
+        return total;
+    }
 
     @Override
     public String toString() {
         return "Pedido{id=" + id + ", cliente='" + cliente + "', estado=" + estado +
-               ", total=" + total + ", fecha=" + fecha + "}";
+                ", total=" + total + ", fecha=" + fecha + "}";
     }
 }

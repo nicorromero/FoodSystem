@@ -1,10 +1,11 @@
-package com.foodSystem.tromer.Service;
+package com.foodSystem.tromer.service;
 
-import com.foodSystem.tromer.DTO.ReservaRequestDTO;
-import com.foodSystem.tromer.DTO.ReservaResponseDTO;
-import com.foodSystem.tromer.Exception.RecursoNoEncontradoException;
-import com.foodSystem.tromer.Logica.Reserva;
-import com.foodSystem.tromer.Repository.ReservaRepository;
+import com.foodSystem.tromer.dataTranferObject.ReservaRequestDTO;
+import com.foodSystem.tromer.dataTranferObject.ReservaResponseDTO;
+import com.foodSystem.tromer.exception.RecursoNoEncontradoException;
+import com.foodSystem.tromer.model.Reserva;
+import com.foodSystem.tromer.repository.ReservaRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -65,10 +66,7 @@ public class ReservaService {
      */
     @Transactional(readOnly = true)
     public List<ReservaResponseDTO> mostrarReservas() {
-        return reservaRepository.findAll()
-            .stream()
-            .map(this::toDTO)
-            .toList();
+        return reservaRepository.findAll().stream().map(this::toDTO).toList();
     }
 
     /**
@@ -79,7 +77,7 @@ public class ReservaService {
     @Transactional(readOnly = true)
     public ReservaResponseDTO buscarPorId(Long id) {
         return reservaRepository.findById(id)
-            .map(this::toDTO)
+                .map(this::toDTO)
             .orElseThrow(() -> new RecursoNoEncontradoException("Reserva", id));
     }
 

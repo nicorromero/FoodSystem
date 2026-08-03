@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.Logica;
+package com.foodSystem.tromer.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,7 +39,8 @@ public class Reserva {
     private LocalDateTime fecha;
 
     /** Constructor requerido por JPA. No usar directamente en código de negocio. */
-    protected Reserva() {}
+    protected Reserva() {
+    }
 
     /**
      * Constructor de fábrica para crear una Reserva en estado válido.
@@ -57,19 +58,33 @@ public class Reserva {
     // --- Getters y Setters ---
     // getId() sin setId(): la PK es responsabilidad de la BD y Hibernate.
 
-    public Long getId() { return id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getCliente() { return cliente; }
+    public String getCliente() {
+        return cliente;
+    }
 
-    public void setCliente(String cliente) { this.cliente = cliente; }
+    public void setCliente(String cliente) {
+        this.cliente = cliente;
+    }
 
-    public int getCantidad() { return cantidad; }
+    public int getCantidad() {
+        return cantidad;
+    }
 
-    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
 
-    public LocalDateTime getFecha() { return fecha; }
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
 
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
 
     @Override
     public String toString() {

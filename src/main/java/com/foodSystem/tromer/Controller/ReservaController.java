@@ -1,8 +1,9 @@
-package com.foodSystem.tromer.Controller;
+package com.foodSystem.tromer.controller;
 
-import com.foodSystem.tromer.DTO.ReservaRequestDTO;
-import com.foodSystem.tromer.DTO.ReservaResponseDTO;
-import com.foodSystem.tromer.Service.ReservaService;
+import com.foodSystem.tromer.dataTranferObject.ReservaRequestDTO;
+import com.foodSystem.tromer.dataTranferObject.ReservaResponseDTO;
+import com.foodSystem.tromer.service.ReservaService;
+
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class ReservaController {
     public ResponseEntity<ReservaResponseDTO> crearReserva(
             @Valid @RequestBody ReservaRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(reservaService.registrarReserva(dto));
+                .body(reservaService.registrarReserva(dto));
     }
 
     /** PUT /api/reservas/{id} → actualiza una reserva existente */

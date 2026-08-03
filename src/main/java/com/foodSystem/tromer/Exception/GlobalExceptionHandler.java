@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.Exception;
+package com.foodSystem.tromer.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 
 /**
  * Manejador global de excepciones para toda la API REST.
- * Utiliza el estándar RFC 9457 (Problem Details for HTTP APIs) nativo de Spring Boot 3.
+ * Utiliza el estándar RFC 9457 (Problem Details for HTTP APIs) nativo de Spring
+ * Boot 3.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -50,18 +51,18 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleBeanValidation(MethodArgumentNotValidException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "La estructura de los datos enviados es inválida");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "La estructura de los datos enviados es inválida");
         problem.setTitle("Error de validación de campos");
         problem.setType(URI.create("https://api.foodsystem.com/errors/field-validation"));
         problem.setProperty("timestamp", LocalDateTime.now());
 
         Map<String, String> erroresCampos = ex.getBindingResult().getFieldErrors().stream()
-            .collect(Collectors.toMap(
-                FieldError::getField,
-                fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Valor inválido",
-                (v1, v2) -> v1
-            ));
-        
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Valor inválido",
+                        (v1, v2) -> v1));
+
         problem.setProperty("invalid_params", erroresCampos);
         return problem;
     }
@@ -69,7 +70,8 @@ public class GlobalExceptionHandler {
     /** Fallback para excepciones no manejadas explícitamente. */
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGeneric(Exception ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Ha ocurrido un error inesperado. Contacte con soporte.");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Ha ocurrido un error inesperado. Contacte con soporte.");
         problem.setTitle("Error interno del servidor");
         problem.setType(URI.create("https://api.foodsystem.com/errors/internal-error"));
         problem.setProperty("timestamp", LocalDateTime.now());

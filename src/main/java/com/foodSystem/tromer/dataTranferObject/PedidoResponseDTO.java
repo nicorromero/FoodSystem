@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.DTO;
+package com.foodSystem.tromer.dataTranferObject;
 
 import java.time.LocalDateTime;
 
@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
  * que causaría LazyInitializationException o recursión infinita con Jackson.
  */
 public record PedidoResponseDTO(
-    Long id,
-    String cliente,
-    String estado,
-    double total,
-    LocalDateTime fecha,
-    Long destinoId,
-    String destinoNombre
-) {}
+        Long id,
+        String cliente,
+        String estado,
+        double total,
+        LocalDateTime fecha,
+        Long destinoId,
+        String destinoNombre) {
+}

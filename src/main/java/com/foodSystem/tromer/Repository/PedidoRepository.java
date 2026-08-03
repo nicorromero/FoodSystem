@@ -1,17 +1,19 @@
-package com.foodSystem.tromer.Repository;
+package com.foodSystem.tromer.repository;
 
-import com.foodSystem.tromer.Logica.EstadoPedido;
-import com.foodSystem.tromer.Logica.Pedido;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.foodSystem.tromer.model.EstadoPedido;
+import com.foodSystem.tromer.model.Pedido;
+
 import java.util.List;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     /**
      * Busca pedidos de un cliente con paginación.
-     * Evita cargar todo el historial de un cliente en memoria de una sola vez.
+     * el historial de un cliente en memoria de una sola vez.
      * Uso: pedidoRepository.findByClienteIgnoreCase("Juan",
      *          PageRequest.of(0, 20, Sort.by("fecha").descending()));
      */
@@ -19,6 +21,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     /**
      * Filtra pedidos por estado con paginación.
+     * 
+     * 
      * Delega el filtrado a la BD (que usa índices) en lugar de filtrar en Java.
      * Útil para el panel de cocina: listar solo pedidos PENDIENTES o EN_PREPARACION.
      */

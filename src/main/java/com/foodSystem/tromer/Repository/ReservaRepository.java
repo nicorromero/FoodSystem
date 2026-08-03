@@ -1,11 +1,13 @@
-package com.foodSystem.tromer.Repository;
+package com.foodSystem.tromer.repository;
 
-import com.foodSystem.tromer.Logica.Reserva;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.foodSystem.tromer.model.Reserva;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,7 +44,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
      */
     @Query("SELECT COUNT(r) > 0 FROM Reserva r WHERE r.fecha BETWEEN :inicio AND :fin")
     boolean existeReservaEnRango(
-        @Param("inicio") LocalDateTime inicio,
-        @Param("fin") LocalDateTime fin
-    );
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin);
 }

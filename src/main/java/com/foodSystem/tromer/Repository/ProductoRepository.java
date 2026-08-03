@@ -1,9 +1,11 @@
-package com.foodSystem.tromer.Repository;
+package com.foodSystem.tromer.repository;
 
-import com.foodSystem.tromer.Logica.Categoria;
-import com.foodSystem.tromer.Logica.Producto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.foodSystem.tromer.model.Categoria;
+import com.foodSystem.tromer.model.Producto;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     Optional<Producto> findByNombre(String nombre);
 
     /**
+     * 
      * Verifica si ya existe un producto con ese nombre exacto.
      * Más eficiente que findByNombre().isPresent(): solo ejecuta COUNT, no SELECT *.
      * Útil para validar duplicados antes de registrar un nuevo producto.

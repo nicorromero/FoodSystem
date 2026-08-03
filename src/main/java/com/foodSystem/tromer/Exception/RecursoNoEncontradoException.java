@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.Exception;
+package com.foodSystem.tromer.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

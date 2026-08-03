@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.Logica;
+package com.foodSystem.tromer.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +16,8 @@ import java.util.Objects;
 /**
  * Entidad que representa un producto del menú.
  * Nota sobre equals/hashCode: implementados sobre 'id' con hashCode constante,
- * siguiendo el patrón recomendado para entidades JPA usadas como keys en colecciones
+ * siguiendo el patrón recomendado para entidades JPA usadas como keys en
+ * colecciones
  * (p.ej. Map<Producto, Integer> en Pedido). Esto garantiza consistencia antes y
  * después de la persistencia.
  */
@@ -43,7 +44,8 @@ public class Producto {
     private Double precio;
 
     /** Constructor requerido por JPA. No usar directamente en código de negocio. */
-    protected Producto() {}
+    protected Producto() {
+    }
 
     /**
      * Constructor de fábrica para crear un Producto en estado válido.
@@ -59,21 +61,36 @@ public class Producto {
     }
 
     // --- Getters ---
-    // setId() eliminado: la PK es responsabilidad exclusiva de la BD y de Hibernate.
+    // setId() eliminado: la PK es responsabilidad exclusiva de la BD y de
+    // Hibernate.
 
-    public Long getId() { return id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getNombre() { return nombre; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public Categoria getCategoria() { return categoria; }
+    public Categoria getCategoria() {
+        return categoria;
+    }
 
-    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
 
-    public Double getPrecio() { return precio; }
+    public Double getPrecio() {
+        return precio;
+    }
 
-    public void setPrecio(Double precio) { this.precio = precio; }
+    public void setPrecio(Double precio) {
+        this.precio = precio;
+    }
 
     // --- equals / hashCode ---
     // Crítico: Producto se usa como KEY en Map<Producto, Integer>.
@@ -82,8 +99,10 @@ public class Producto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Producto)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Producto))
+            return false;
         Producto producto = (Producto) o;
         // Comparar por ID solo cuando ambos están persistidos
         return id != null && Objects.equals(id, producto.id);

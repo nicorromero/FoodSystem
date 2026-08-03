@@ -1,12 +1,14 @@
-package com.foodSystem.tromer.Service;
+package com.foodSystem.tromer.service;
 
-import com.foodSystem.tromer.DTO.PedidoRequestDTO;
-import com.foodSystem.tromer.DTO.PedidoResponseDTO;
-import com.foodSystem.tromer.DTO.ProductoRequestDTO;
-import com.foodSystem.tromer.DTO.ProductoResponseDTO;
-import com.foodSystem.tromer.DTO.ReservaRequestDTO;
-import com.foodSystem.tromer.DTO.ReservaResponseDTO;
 import org.springframework.stereotype.Service;
+
+import com.foodSystem.tromer.dataTranferObject.PedidoRequestDTO;
+import com.foodSystem.tromer.dataTranferObject.PedidoResponseDTO;
+import com.foodSystem.tromer.dataTranferObject.ProductoRequestDTO;
+import com.foodSystem.tromer.dataTranferObject.ProductoResponseDTO;
+import com.foodSystem.tromer.dataTranferObject.ReservaRequestDTO;
+import com.foodSystem.tromer.dataTranferObject.ReservaResponseDTO;
+
 import java.util.List;
 
 /**
@@ -15,10 +17,14 @@ import java.util.List;
  * dominios o para simplificar el acceso desde clientes internos.
  *
  * BUGS CORREGIDOS:
- * - editarReservaExistente() antes llamaba a eliminarReserva() en lugar de editarReserva()
- * - editarProductoExistente() antes pasaba precio=0 hardcodeado ignorando el parámetro real
- * - mostrarXxx() antes retornaban void, descartando los resultados de los servicios
- * - Constructor vacío public eliminado para garantizar inmutabilidad de dependencias
+ * - editarReservaExistente() antes llamaba a eliminarReserva() en lugar de
+ * editarReserva()
+ * - editarProductoExistente() antes pasaba precio=0 hardcodeado ignorando el
+ * parámetro real
+ * - mostrarXxx() antes retornaban void, descartando los resultados de los
+ * servicios
+ * - Constructor vacío public eliminado para garantizar inmutabilidad de
+ * dependencias
  */
 @Service
 public class GestorService {
@@ -28,8 +34,8 @@ public class GestorService {
     private final ReservaService gestorReserva;
 
     public GestorService(ProductoService gestorProducto,
-                         PedidoService gestorPedido,
-                         ReservaService gestorReserva) {
+            PedidoService gestorPedido,
+            ReservaService gestorReserva) {
         this.gestorProducto = gestorProducto;
         this.gestorPedido = gestorPedido;
         this.gestorReserva = gestorReserva;
@@ -45,7 +51,9 @@ public class GestorService {
         gestorProducto.eliminarProducto(id);
     }
 
-    /** CORREGIDO: ahora pasa el dto completo (antes pasaba precio=0 hardcodeado). */
+    /**
+     * CORREGIDO: ahora pasa el dto completo (antes pasaba precio=0 hardcodeado).
+     */
     public ProductoResponseDTO editarProductoExistente(Long id, ProductoRequestDTO dto) {
         return gestorProducto.editarProducto(id, dto);
     }
@@ -84,7 +92,10 @@ public class GestorService {
         gestorReserva.eliminarReserva(id);
     }
 
-    /** CORREGIDO: ahora llama a editarReserva() (antes llamaba a eliminarReserva() — bug crítico). */
+    /**
+     * CORREGIDO: ahora llama a editarReserva() (antes llamaba a eliminarReserva() —
+     * bug crítico).
+     */
     public ReservaResponseDTO editarReservaExistente(Long id, ReservaRequestDTO dto) {
         return gestorReserva.editarReserva(id, dto);
     }

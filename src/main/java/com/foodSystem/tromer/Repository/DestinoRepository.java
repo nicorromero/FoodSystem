@@ -1,8 +1,9 @@
-package com.foodSystem.tromer.Repository;
+package com.foodSystem.tromer.repository;
 
-import com.foodSystem.tromer.Logica.Destino;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.foodSystem.tromer.model.Destino;
 
 /**
  * Repositorio para la jerarquía de entidades Destino (Mesa y Delivery).

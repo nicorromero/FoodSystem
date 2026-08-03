@@ -1,4 +1,4 @@
-package com.foodSystem.tromer.DTO;
+package com.foodSystem.tromer.dataTranferObject;
 
 /**
  * DTO de salida para Producto.
@@ -7,8 +7,8 @@ package com.foodSystem.tromer.DTO;
  * de serialización.
  */
 public record ProductoResponseDTO(
-    Long id,
-    String nombre,
-    String categoria,
-    Double precio
-) {}
+        Long id,
+        String nombre,
+        String categoria,
+        Double precio) {
+}

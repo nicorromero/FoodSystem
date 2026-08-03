@@ -1,11 +1,12 @@
-package com.foodSystem.tromer.Service;
+package com.foodSystem.tromer.service;
 
-import com.foodSystem.tromer.DTO.ProductoRequestDTO;
-import com.foodSystem.tromer.DTO.ProductoResponseDTO;
-import com.foodSystem.tromer.Exception.RecursoNoEncontradoException;
-import com.foodSystem.tromer.Logica.Categoria;
-import com.foodSystem.tromer.Logica.Producto;
-import com.foodSystem.tromer.Repository.ProductoRepository;
+import com.foodSystem.tromer.dataTranferObject.ProductoRequestDTO;
+import com.foodSystem.tromer.dataTranferObject.ProductoResponseDTO;
+import com.foodSystem.tromer.exception.RecursoNoEncontradoException;
+import com.foodSystem.tromer.model.Categoria;
+import com.foodSystem.tromer.model.Producto;
+import com.foodSystem.tromer.repository.ProductoRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -15,8 +16,8 @@ import java.util.List;
  *
  * Transaccionalidad:
  * - @Transactional a nivel de clase garantiza atomicidad en escrituras.
- * - readOnly=true en lecturas desactiva el dirty checking de Hibernate,
- *   optimizando el rendimiento de consultas.
+ * readOnly=true en lecturas desactiva el dirty checking de Hibernate,
+ * optimizando el rendimiento de consultas.
  */
 @Service
 @Transactional
@@ -26,6 +27,16 @@ public class ProductoService {
 
     public ProductoService(ProductoRepository productoRepository) {
         this.productoRepository = productoRepository;
+    }
+
+    /** Convierte una entidad Producto a su DTO de salida. */
+    private ProductoResponseDTO toDTO(Producto save) {
+        return new ProductoResponseDTO(
+            save.getId(),
+            save.getNombre(),
+            save.getCategoria().name(),
+            save.getPrecio()
+        );
     }
 
     /**
@@ -47,10 +58,7 @@ public class ProductoService {
      */
     @Transactional(readOnly = true)
     public List<ProductoResponseDTO> mostrarProductos() {
-        return productoRepository.findAll()
-            .stream()
-            .map(this::toDTO)
-            .toList();
+        return productoRepository.findAll().stream().map(this::toDTO).toList();
     }
 
     /**
@@ -60,8 +68,8 @@ public class ProductoService {
     public List<ProductoResponseDTO> mostrarProductosPorCategoria(String categoria) {
         Categoria cat = Categoria.desdeString(categoria);
         return productoRepository.findByCategoria(cat)
-            .stream()
-            .map(this::toDTO)
+                .stream()
+                .map(this::toDTO)
             .toList();
     }
 
@@ -73,7 +81,7 @@ public class ProductoService {
     @Transactional(readOnly = true)
     public ProductoResponseDTO buscarPorId(Long id) {
         return productoRepository.findById(id)
-            .map(this::toDTO)
+                .map(this::toDTO)
             .orElseThrow(() -> new RecursoNoEncontradoException("Producto", id));
     }
 
@@ -102,15 +110,5 @@ public class ProductoService {
             throw new RecursoNoEncontradoException("Producto", id);
         }
         productoRepository.deleteById(id);
-    }
-
-    /** Convierte una entidad Producto a su DTO de salida. */
-    private ProductoResponseDTO toDTO(Producto p) {
-        return new ProductoResponseDTO(
-            p.getId(),
-            p.getNombre(),
-            p.getCategoria().name(),
-            p.getPrecio()
-        );
     }
 }
