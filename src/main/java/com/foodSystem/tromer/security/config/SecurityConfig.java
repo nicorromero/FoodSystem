@@ -13,6 +13,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Desactiva CSRF para APIs stateless
                 .authorizeHttpRequests(auth -> auth
+                        // Permite acceso público a la interfaz de Swagger y documentación OpenAPI
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/**") // Protege todas las rutas API
                         .authenticated() // Requiere autenticación (JWT)
                 )

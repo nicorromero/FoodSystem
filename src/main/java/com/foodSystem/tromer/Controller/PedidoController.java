@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * Controlador REST para la gestión de Pedidos.
@@ -20,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/pedidos")
+@Tag(name = "Pedidos", description = "Gestión del ciclo de vida de los pedidos")
 public class PedidoController {
 
     private final PedidoService pedidoService;
@@ -29,12 +34,18 @@ public class PedidoController {
     }
 
     /** GET /api/pedidos → lista todos los pedidos */
+    @Operation(summary = "Listar todos los pedidos")
     @GetMapping
     public ResponseEntity<List<PedidoResponseDTO>> listarPedidos() {
         return ResponseEntity.ok(pedidoService.mostrarPedido());
     }
 
     /** GET /api/pedidos/{id} → busca un pedido por ID */
+    @Operation(summary = "Obtener un pedido por su ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Pedido encontrado"),
+        @ApiResponse(responseCode = "404", description = "Pedido no encontrado")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> obtenerPedido(@PathVariable Long id) {
         return ResponseEntity.ok(pedidoService.buscarPorId(id));
@@ -45,6 +56,12 @@ public class PedidoController {
      * El estado se fija a PENDIENTE automáticamente; no se acepta en el body al
      * crear.
      */
+    @Operation(summary = "Crear un nuevo pedido", description = "El estado inicial siempre será PENDIENTE.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Pedido creado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
+        @ApiResponse(responseCode = "404", description = "El destino indicado no existe")
+    })
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> crearPedido(
             @Valid @RequestBody PedidoRequestDTO dto) {
@@ -53,6 +70,7 @@ public class PedidoController {
     }
 
     /** PUT /api/pedidos/{id} → actualiza cliente, destino y/o estado */
+    @Operation(summary = "Actualizar un pedido existente", description = "Permite modificar el cliente, el destino y avanzar el estado.")
     @PutMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> actualizarPedido(
             @PathVariable Long id,
@@ -61,6 +79,7 @@ public class PedidoController {
     }
 
     /** DELETE /api/pedidos/{id} → elimina un pedido (HTTP 404 si no existe) */
+    @Operation(summary = "Eliminar un pedido por su ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarPedido(@PathVariable Long id) {
         pedidoService.eliminarPedido(id);
