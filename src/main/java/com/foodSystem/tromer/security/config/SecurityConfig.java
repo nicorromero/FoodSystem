@@ -15,7 +15,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Permite acceso público a la interfaz de Swagger y documentación OpenAPI
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/**") // Protege todas las rutas API
+                        // Permite acceso público al endpoint de login/registro
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/**") // Protege el resto de las rutas API
                         .authenticated() // Requiere autenticación (JWT)
                 )
                 .httpBasic(basic -> basic.disable()) // Desactiva Basic Auth
