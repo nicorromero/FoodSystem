@@ -1,0 +1,31 @@
+﻿version: '3.8'
+
+services:
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql_food_system
+    restart: always
+    environment:
+      MYSQL_DATABASE: systemfood
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: .
+    container_name: food_system_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:mysql://mysql_db:3306/systemfood?useSSL=false&serverTimezone=UTC
+      - DB_USERNAME=root
+      - DB_PASSWORD=rootpassword
+    depends_on:
+      - mysql_db
+
+volumes:
+  mysql_data:
