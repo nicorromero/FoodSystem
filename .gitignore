@@ -31,5 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
-
 .env
+
+# Reportes y análisis (no necesarios en el repositorio)
+CODE_REVIEW_ISSUES.md
+CODE-REVIEW_ISSUES.md
+REMEDIATION_REPORT.md
+*REPORT*.md
+*REVIEW*.md
+

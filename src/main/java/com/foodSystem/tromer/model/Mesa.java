@@ -4,7 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+//import jakarta.validation.constraints.NotBlank;
 
 /**
  * Destino concreto para pedidos atendidos en una mesa del local.

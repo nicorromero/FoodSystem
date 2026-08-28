@@ -20,8 +20,12 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+                String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+                if (allowedOrigins == null || allowedOrigins.isBlank()) {
+                    allowedOrigins = "http://localhost:3000,http://localhost:5173";
+                }
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "http://localhost:5173") // Puertos comunes de React (Vite o Create React App)
+                        .allowedOriginPatterns(allowedOrigins.split(","))
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With");
             }

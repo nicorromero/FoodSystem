@@ -1,0 +1,28 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+nb-configuration.xml
+
+# Build output
+target/
+
+# Logs
+*.log
+
+# Documentation (no necesaria en imagen)
+*.md
+
+# Dependencias Node (si aplica)
+node_modules/
+
+# Maven wrapper (ya empaquetado en la etapa build)
+.mvn/wrapper
+mvnw.cmd
+
+# Environment files (no deben estar en la imagen)
+.env

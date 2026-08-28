@@ -4,7 +4,13 @@ import com.foodSystem.tromer.security.jwt.JwtAuthenticationFilter;
 import com.foodSystem.tromer.security.jwt.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtService jwtService;
@@ -24,24 +31,46 @@ public class SecurityConfig {
     }
 
     @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtService, userDetailsService);
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable()) // Desactiva CSRF para APIs stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Permite acceso público a la interfaz de Swagger y documentación OpenAPI
+                        // Swagger / OpenAPI
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        // Permite acceso público al endpoint de login/registro
+                        // Auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/**") // Protege el resto de las rutas API
-                        .authenticated() // Requiere autenticación (JWT)
+                        // Actuator health (para healthcheck de Docker)
+                        .requestMatchers("/actuator/health").permitAll()
+                        // Protege el resto de las rutas API
+                        .requestMatchers("/api/**").authenticated()
                 )
                 .httpBasic(basic -> basic.disable()) // Desactiva Basic Auth
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(
-                        new JwtAuthenticationFilter(jwtService, userDetailsService),
+                        jwtAuthenticationFilter(),
                         UsernamePasswordAuthenticationFilter.class
                 );
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean

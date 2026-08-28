@@ -1,31 +1,63 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
   mysql_db:
-    image: mysql:8.0
+    # Opción A: MariaDB (Recomendado: imagen de ~150MB y usa <120MB de RAM)
+    image: mariadb:lts
+    # Opción B (Si requieres MySQL estricto): image: mysql:8.0
     container_name: mysql_food_system
     restart: always
     environment:
-      MYSQL_DATABASE: systemfood
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: foodsystem_db
+    # Ajustes clave para reducir drásticamente el consumo de RAM en local
+    command:
+      - --performance-schema=OFF
+      - --innodb-buffer-pool-size=64M
+      - --max-connections=50
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: adminer:fastcgi # Alternativamente 'adminer:latest' (~30MB)
+    container_name: foodsystem_adminer
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql_db
 
   backend:
     build: .
     container_name: food_system_backend
-    restart: always
+    restart: on-failure
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:mysql://mysql_db:3306/systemfood?useSSL=false&serverTimezone=UTC
-      - DB_USERNAME=root
-      - DB_PASSWORD=rootpassword
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=mysql_db
+      - DB_PORT=3306
+      - DB_NAME=foodsystem_db
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     depends_on:
-      - mysql_db
+      mysql_db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   mysql_data:
