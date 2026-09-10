@@ -37,10 +37,8 @@ jobs:
           cache: 'maven'
 
       - name: Compilar y Ejecutar Tests
-        run: ./mvnw verify -B
+        run: chmod +x mvnw && ./mvnw verify -B
         env:
-          # Estas variables sobrescriben las de application.properties 
-          # para que la app se conecte a la base de datos de test del workflow
           DB_URL: jdbc:mysql://127.0.0.1:3306/systemfood?useSSL=false&serverTimezone=UTC
           DB_USERNAME: root
           DB_PASSWORD: test

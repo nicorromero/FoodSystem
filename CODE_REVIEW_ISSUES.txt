@@ -1,0 +1,194 @@
+# Code Review: Issues & Fixes
+
+## CRITICAL – Must Fix Before Deployment
+
+### 1. Missing JWT Secret Configuration
+**File**: `src/main/resources/application-dev.properties`  
+**Problem**: `jwt.secret` property is not set. App crashes on startup.  
+**Fix**:
+```properties
+jwt.secret=dXNlci1zZWNyZXQta2V5LWZvci1qd3Qtc2lnbmluZy1iYXNlNjQtZW5jb2Rpbmdz
+```
+(Replace with your own Base64-encoded key ≥32 bytes)
+
+### 2. No Authentication Endpoint
+**Files**: Missing `AuthController.java`; `SecurityConfig.java` allows `/api/auth/**`  
+**Problem**: Users cannot login to get JWT tokens. The entire auth system is a no-op.  
+**Fix**: Create `src/main/java/com/foodSystem/tromer/controller/AuthController.java`:
+```java
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+
+    // POST /api/auth/login - returns JWT token
+    // POST /api/auth/register - creates user
+}
+```
+
+### 3. Missing User Entity & UserRepository
+**Files**: `CustomUserDetailsService.java` references non-existent `UserRepository`  
+**Problem**: App crashes when Spring loads `CustomUserDetailsService`.  
+**Fix**: Create:
+- `src/main/java/com/foodSystem/tromer/model/User.java` (JPA @Entity)
+- `src/main/java/com/foodSystem/tromer/security/repository/UserRepository.java` (extends JpaRepository)
+
+---
+
+## HIGH PRIORITY – Production Issues
+
+### 4. Database Configuration Won't Work in Docker
+**File**: `src/main/resources/application-dev.properties`  
+**Problem**: Hardcodes `localhost:3306`, but docker-compose passes `DB_HOST=mysql_db`. Connections fail.  
+**Fix**: Create `src/main/resources/application-prod.properties`:
+```properties
+spring.datasource.url=jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:foodsystem_db}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username=${DB_USER:root}
+spring.datasource.password=${DB_PASSWORD:rootpassword}
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+springdoc.swagger-ui.enabled=false
+```
+And update `docker-compose.yml` backend service: `SPRING_PROFILES_ACTIVE=prod`
+
+### 5. JWT Token Extraction Can Crash Filter
+**File**: `src/main/java/com/foodSystem/tromer/security/jwt/JwtAuthenticationFilter.java`  
+**Problem**: No try-catch around `jwtService.extractUsername(token)` or `validateToken()`. Malformed/expired tokens throw uncaught exceptions → 500 error instead of 401.  
+**Fix**:
+```java
+try {
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        token = authHeader.replace("Bearer ", "");
+        username = jwtService.extractUsername(token);
+    }
+} catch (Exception e) {
+    // Invalid/expired token – just log and continue (SecurityContext stays null)
+    // Chain will reach a protected endpoint → 403 Forbidden
+    return;
+}
+```
+
+### 6. Hardcoded Database Password in docker-compose.yml
+**File**: `docker-compose.yml`  
+**Problem**: `MYSQL_ROOT_PASSWORD: rootpassword` is plaintext in version control.  
+**Fix**: Create `.env` file:
+```
+DB_USER=root
+DB_PASSWORD=your_secure_password_here
+MYSQL_ROOT_PASSWORD=your_secure_password_here
+```
+Update `docker-compose.yml`:
+```yaml
+environment:
+  MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  DB_PASSWORD: ${DB_PASSWORD}
+```
+
+### 7. CORS Configuration Too Restrictive
+**File**: `src/main/java/com/foodSystem/tromer/CorsConfig.java`  
+**Problem**: Hardcodes localhost:3000 and localhost:5173. Deployed frontend can't connect.  
+**Fix**:
+```java
+String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+if (allowedOrigins == null) {
+    allowedOrigins = "http://localhost:3000,http://localhost:5173";
+}
+registry.addMapping("/**")
+    .allowedOriginPatterns(allowedOrigins.split(","))
+    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+    .allowedHeaders("Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With");
+```
+
+---
+
+## MEDIUM PRIORITY – Code Quality
+
+### 8. No Health Check for Backend (docker-compose)
+**File**: `docker-compose.yml`, backend service  
+**Problem**: No healthcheck; frontend/clients have no way to detect if backend is ready.  
+**Fix**:
+```yaml
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+```
+(Requires Spring Boot Actuator dependency)
+
+### 9. No .dockerignore File
+**File**: Missing `.dockerignore`  
+**Problem**: Unnecessary files (`*.log`, `.git`, `.idea`, `target/` from prev builds) bloat Docker context.  
+**Fix**: Create `.dockerignore`:
+```
+*.log
+*.md
+.git
+.gitignore
+.idea
+.vscode
+target/
+node_modules/
+.mvn/wrapper
+mvnw.cmd
+nb-configuration.xml
+.gitattributes
+```
+
+### 10. JWT Filter Not Registered as Spring Bean
+**File**: `SecurityConfig.java`  
+**Problem**: `JwtAuthenticationFilter` is instantiated inline with `new JwtAuthenticationFilter(...)`. If Spring needs to inject dependencies into it later, it fails.  
+**Fix**: Register as @Bean:
+```java
+@Bean
+public JwtAuthenticationFilter jwtAuthenticationFilter() {
+    return new JwtAuthenticationFilter(jwtService, userDetailsService);
+}
+```
+
+---
+
+## LOW PRIORITY – Polish
+
+### 11. Empty Maven POM Tags
+**File**: `pom.xml`  
+**Problem**: `<license/>`, `<developer/>`, SCM tags are empty.  
+**Fix**: Fill or remove:
+```xml
+<license>
+  <name>MIT</name>
+</license>
+<developers>
+  <developer>
+    <id>nicorromero</id>
+    <name>Nico Romero</name>
+  </developer>
+</developers>
+```
+
+### 12. Inconsistent Naming (DTOs)
+**File**: `dataTranferObject/` directory  
+**Problem**: Should be `dataTransferObject` (typo: "Tranfer" → "Transfer").  
+**Note**: Low priority; renaming requires package changes. Document for future refactor.
+
+---
+
+## Summary Table
+
+| Issue | File | Severity | Impact |
+|-------|------|----------|--------|
+| Missing `jwt.secret` | application-dev.properties | CRITICAL | App won't start |
+| No `/api/auth` endpoint | Missing AuthController | CRITICAL | Can't login |
+| Missing User entity | Missing User.java, UserRepository | CRITICAL | App crashes |
+| Dev DB config won't work in Docker | application-dev.properties | HIGH | Docker deployment fails |
+| JWT filter unprotected | JwtAuthenticationFilter | HIGH | Malformed tokens → 500 errors |
+| Hardcoded DB password | docker-compose.yml | HIGH | Security risk |
+| CORS hardcoded | CorsConfig.java | HIGH | Frontend deployment fails |
+| No backend health check | docker-compose.yml | MEDIUM | Unreliable startup |
+| No .dockerignore | Missing file | MEDIUM | Bloated images |
+| JWT filter not a bean | SecurityConfig.java | MEDIUM | Future injection issues |
+| Empty pom.xml tags | pom.xml | LOW | Metadata completeness |
+
