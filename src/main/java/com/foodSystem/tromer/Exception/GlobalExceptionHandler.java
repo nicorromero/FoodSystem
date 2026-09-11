@@ -1,5 +1,6 @@
 package com.foodSystem.tromer.exception;
 
+import com.foodSystem.tromer.security.ratelimit.RateLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -64,6 +65,21 @@ public class GlobalExceptionHandler {
                         (v1, v2) -> v1));
 
         problem.setProperty("invalid_params", erroresCampos);
+        return problem;
+    }
+
+    /**
+     * Captura intentos de login que exceden los límites de rate limiting.
+     * Retorna HTTP 429 Too Many Requests con información de cuánto esperar.
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ProblemDetail handleRateLimit(RateLimitExceededException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+        problem.setTitle("Demasiados intentos");
+        problem.setType(URI.create("https://api.foodsystem.com/errors/rate-limit"));
+        problem.setProperty("timestamp", LocalDateTime.now());
+        problem.setProperty("retryAfterSeconds", ex.getRetryAfterSeconds());
         return problem;
     }
 
